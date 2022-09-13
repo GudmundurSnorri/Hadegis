@@ -1,4 +1,5 @@
 import type { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { trpc } from "../utils/trpc";
 
@@ -10,7 +11,7 @@ type TechnologyCardProps = {
 
 const Home: NextPage = () => {
   const hello = trpc.useQuery(["example.hello", { text: "from tRPC" }]);
-
+  const session = useSession();
   return (
     <>
       <Head>
@@ -26,9 +27,9 @@ const Home: NextPage = () => {
         <p className="text-2xl text-gray-700">This stack uses:</p>
         <div className="grid gap-3 pt-3 mt-3 text-center md:grid-cols-2 lg:w-2/3">
           <TechnologyCard
-            name="NextJS"
+            name="inputs"
             description="The React framework for production"
-            documentation="https://nextjs.org/"
+            documentation="/inputs"
           />
           <TechnologyCard
             name="TypeScript"
