@@ -6,7 +6,7 @@ const SignIn = () => {
     return (
       <>
         Signed in as {session?.user?.name} <br />
-        <button onClick={() => signOut()}>Sign out</button>
+        <button  onClick={() => signOut()}>Sign out</button>
       </>
     );
   }

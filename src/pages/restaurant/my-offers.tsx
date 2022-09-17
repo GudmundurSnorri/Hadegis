@@ -1,7 +1,9 @@
 import { Offer } from "@prisma/client";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
 import { useState } from "react";
+import AppLayout from "../../components/app-layout/AppLayout";
+import MyOffersList from "../../components/auth-my-offers-list/MyOffersList";
+import MyOffersListRow from "../../components/auth-my-offers-list/MyOffersListRow";
 import { trpc } from "../../utils/trpc";
 
 const MyOffers = () => {
@@ -9,7 +11,8 @@ const MyOffers = () => {
   const [offers, setOffers] = useState<Offer[]>();
   const deleteOffer = trpc.useMutation(["example.deleteOffer"]);
   const activeStatusOffer = trpc.useMutation(["example.setActiveStatus"]);
-
+  const isAuthenticated = status === "authenticated";
+  
   const { isLoading, isSuccess, isError } = trpc.useQuery(
     ["example.getOfferByRestaurant", { userId: session?.user?.id || "" }],
     {
@@ -18,6 +21,12 @@ const MyOffers = () => {
       },
     }
   );
+
+  if (!offers || isLoading || !isSuccess || isError) {
+    return "Hleður...";
+  }
+  
+  
   const handleDelete = async (offerId: string) => {
     deleteOffer.mutate(
       { offerId },
@@ -29,10 +38,6 @@ const MyOffers = () => {
       }
     );
   };
-
-  if (!offers || isLoading || !isSuccess || isError) {
-    return "Hleður...";
-  }
 
   const handleActiveStatus = (id: string, active: boolean) => {
     activeStatusOffer.mutate(
@@ -50,34 +55,26 @@ const MyOffers = () => {
       }
     );
   };
-
+  console.log(offers);
   return (
-    <div>
-      {status === "authenticated"
-        ? offers.map((item) => (
-            <li key={item.id} className="flex-col">
-              <h1>{item.title}</h1>
-              <h1>{item.price}</h1>
-              <h1>{item.active ? "active" : "Not active"}</h1>
-              <Link href={`/restaurant/update-offer/${item.id}`}>
-                Uppfæra tilboð
-              </Link>
-              <div>
-                <button
-                  onClick={() => handleActiveStatus(item.id, item.active)}
-                >
-                  Gera aktíft
-                </button>
-              </div>
-              <div>
-                <button onClick={() => handleDelete(item.id)}>
-                  Eyða tilboði.
-                </button>
-              </div>
-            </li>
-          ))
-        : "Þú mátt ekki skoða þetta!"}
-    </div>
+    <AppLayout>
+      <MyOffersList>
+        {isAuthenticated
+          ? offers.map((item) => (
+              <MyOffersListRow
+                key={item.id}
+                typeOfOffer={item.typeOfOffer}
+                id={item.id}
+                name={item.title}
+                price={item.price}
+                isActive={item.active}
+                makeActive={() => handleActiveStatus(item.id, item.active)}
+                deleteOffer={() => handleDelete(item.id)}
+              />
+            ))
+          : "Þú mátt ekki skoða þetta!"}
+      </MyOffersList>
+    </AppLayout>
   );
 };
 

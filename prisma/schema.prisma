@@ -51,13 +51,14 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
-  password      String? 
+  password      String?
   emailVerified DateTime?
   website       String?
   description   String?
   ahaId         String?
   dineoutId     String?
   image         String?
+  menuUrl       String?
   accounts      Account[]
   sessions      Session[]
   offers        Offer[]
@@ -72,7 +73,7 @@ model VerificationToken {
 }
 
 model Offer {
-  id           String      @id @default(cuid())
+  id           String       @id @default(cuid())
   title        String
   description  String
   price        Int
@@ -83,7 +84,7 @@ model Offer {
   typeOfOffer  TypeOfOffer
   whichWeekDay DayOffer?
   whichMonth   MonthOffer?
-  user         User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String?
 }
 
